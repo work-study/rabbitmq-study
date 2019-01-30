@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       http://www.springframework.org/schema/rabbit
+       http://www.springframework.org/schema/rabbit/spring-rabbit-1.7.xsd">
+
+    <!--定义连接工厂，基本的连接信息，连接，密码账号，主机等信息-->
+    <rabbit:connection-factory id="connectionFactory"
+                               host="127.0.0.1" port="5672" username="user_mmr" password="user_mmr"
+                               virtual-host="/vhost_mmr" channel-cache-size="5"/>
+    <!-- 配置admin，自动根据配置文件生成交换器和队列，无需手动配置 -->
+    <rabbit:admin connection-factory="connectionFactory"/>
+
+    <!-- queue 队列声明 durable="true"：是否持久化-->
+    <rabbit:queue  durable="true" auto-declare="true" name="spring_fanout_test"/>
+
+    <!-- exchange queue binging-->
+    <rabbit:fanout-exchange name="fanoutExchange" auto-declare="true">
+        <rabbit:bindings>
+            <rabbit:binding queue="spring_fanout_test"/>
+        </rabbit:bindings>
+    </rabbit:fanout-exchange>
+
+    <!--监听队列-->
+    <rabbit:listener-container connection-factory="connectionFactory" requeue-rejected="false">
+        <rabbit:listener ref="recv01" queue-names="spring_fanout_test"/>
+    </rabbit:listener-container>
+
+    <bean class="com.kaola.rabbitmq.spring.fanout.Recv01" id="recv01"/>
+</beans>

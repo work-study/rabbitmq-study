@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       http://www.springframework.org/schema/rabbit
+       http://www.springframework.org/schema/rabbit/spring-rabbit-1.7.xsd">
+
+    <!--定义连接工厂，基本的连接信息，连接，密码账号，主机等信息-->
+    <rabbit:connection-factory id="connectionFactory"
+                               host="127.0.0.1" port="5672" username="user_mmr" password="user_mmr"
+                               virtual-host="/vhost_mmr" channel-cache-size="5"/>
+    <!-- 配置admin，自动根据配置文件生成交换器和队列，无需手动配置 -->
+    <rabbit:admin connection-factory="connectionFactory"/>
+    <!-- 声明交换器 -->
+    <rabbit:direct-exchange name="routingExchange" auto-declare="true"/>
+
+    <!-- spring template声明 -->
+    <rabbit:template id="amqpTemplate" exchange="routingExchange" connection-factory="connectionFactory"/>
+
+</beans>
